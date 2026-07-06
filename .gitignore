@@ -1,0 +1,20 @@
+# Eclipse / IDE metadata
+.metadata/
+.settings/
+.classpath
+.project
+bin/
+
+# Spring Boot build files
+**/target/
+**.log
+
+# Angular build files
+**/node_modules/
+**/.angular/
+**/dist/
+
+# Python caching & Models
+**/__pycache__/
+**/*.pyc
+**/yolov8n.pt

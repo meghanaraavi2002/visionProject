@@ -1,0 +1,30 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <h1>🛡️ Real-Time Security Telemetry</h1>
+    <p>Live tracking connection status: <span class="badge active">CONNECTED</span></p>
+  </header>
+
+  <!-- Empty State Condition -->
+  <div *ngIf="trackingEvents.length === 0" class="empty-state">
+    <div class="spinner"></div>
+    <p>Waiting for incoming Python telemetry streams...</p>
+  </div>
+
+  <!-- Real-Time Grid Cards -->
+  <div class="cards-grid">
+    <div *ngFor="let event of trackingEvents" 
+         class="event-card" 
+         [ngClass]="{'status-alert': event.status === 'ENTERED', 'status-clear': event.status === 'LEFT'}">
+      
+      <div class="card-header">
+        <span class="object-id">ID: #{{ event.id || 'Pending' }}</span>
+        <span class="status-indicator">{{ event.status }}</span>
+      </div>
+      
+      <div class="card-body">
+        <h3>{{ event.name }}</h3>
+        <p class="timestamp">🕒 Logged At: {{ event.timeStamp | date:'mediumTime' }}</p>
+      </div>
+    </div>
+  </div>
+</div>
