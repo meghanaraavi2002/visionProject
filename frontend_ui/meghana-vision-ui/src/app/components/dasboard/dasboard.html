@@ -4,14 +4,14 @@
     <p>Live tracking connection status: <span class="badge active">CONNECTED</span></p>
   </header>
 
-  <!-- Empty State Condition -->
+  <!-- Empty State Condition: Shows ONLY while waiting for the first payload -->
   <div *ngIf="trackingEvents.length === 0" class="empty-state">
     <div class="spinner"></div>
     <p>Waiting for incoming Python telemetry streams...</p>
   </div>
 
-  <!-- Real-Time Grid Cards -->
-  <div class="cards-grid">
+  <!-- Real-Time Grid Cards: Renders dynamically once trackingEvents contains elements -->
+  <div *ngIf="trackingEvents.length > 0" class="cards-grid">
     <div *ngFor="let event of trackingEvents" 
          class="event-card" 
          [ngClass]="{'status-alert': event.status === 'ENTERED', 'status-clear': event.status === 'LEFT'}">

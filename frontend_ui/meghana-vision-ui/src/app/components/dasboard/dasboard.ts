@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TelemetryService } from '../../services/telemetry';
 import { Subscription } from 'rxjs';
@@ -16,7 +16,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   public trackingEvents: any[] = [];
   private streamSubscription!: Subscription;
 
-  constructor(private telemetryService: TelemetryService) { }
+  // Injected ChangeDetectorRef to force UI repaints on asynchronous background events
+  constructor(
+    private telemetryService: TelemetryService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     console.log('[FRONTEND LOG] Subscribing to real-time security telemetry stream...');
@@ -24,8 +28,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.streamSubscription = this.telemetryService.getLiveTelemetry().subscribe({
       next: (event) => {
         console.log('[FRONTEND LOG] New target event received:', event);
-        // Add new events to the top of the list so recent objects show first
+        
+        // 1. Scan the list to find if a card for this target entity name already exists
+        const existingIndex = this.trackingEvents.findIndex(e => e.name === event.name);
+
+        if (existingIndex !== -1) {
+          // 2. Deduplicate: Rip out the old historical event status snapshot
+          this.trackingEvents.splice(existingIndex, 1);
+        }
+
+        // 3. Float the updated state transition directly to the top of the viewport
         this.trackingEvents.unshift(event);
+
+        // Force Angular to evaluate the array length and repaint the DOM instantly
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('[FRONTEND LOG] Stream connection encountered an error:', err);
