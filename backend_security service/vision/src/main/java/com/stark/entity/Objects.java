@@ -1,33 +1,28 @@
 package com.stark.entity;
 
 import com.meghana.enums.Status;
+import jakarta.persistence.*;
 
-import jakarta.persistence.Column;
-// 1. Fix the imports to target the persistence package
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-
-
-@Entity // 2. Tell Jakarta that this is a database entity
-@Table(name = "OBJECTS") // Fixed typo from OBJETCS to OBJECTS
+@Entity
+@Table(name = "OBJECTS")
 public class Objects {
 
-    @Id // 3. Every JPA entity requires a Primary Key field
-    @Column(name="ID")
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
     private Long id;
-    @Column(name="OBJECT_NAME")
+
+    @Column(name = "TRACK")
+    private Long track;
+
+    @Column(name = "OBJECT_NAME")
     private String name;
-    
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "STATUS")
     private Status status;
-    
-    @Column(name="TIME")
+
+    @Column(name = "TIME")
     private String timeStamp;
 
 	public Long getId() {
@@ -36,6 +31,14 @@ public class Objects {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Long getTrack() {
+		return track;
+	}
+
+	public void setTrack(Long track) {
+		this.track = track;
 	}
 
 	public String getName() {
@@ -61,9 +64,12 @@ public class Objects {
 	public void setTimeStamp(String timeStamp) {
 		this.timeStamp = timeStamp;
 	}
-    
-    
-    
-    
+
+	@Override
+	public String toString() {
+		return "Objects [id=" + id + ", tId=" + track + ", name=" + name + ", status=" + status + ", timeStamp="
+				+ timeStamp + "]";
+	}
+
     
 }

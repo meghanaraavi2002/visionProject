@@ -25,7 +25,8 @@ public class ObjectApi {
 	
 	@PostMapping("/event")
 	public ResponseEntity<ObjectsDTO > receiveTelemetry(@RequestBody ObjectsDTO objectsDto){
-		System.out.println("[BACKEND LOG] Received payload from Python:"+objectsDto.getName()+"status:"+objectsDto.getStatus());
+		System.out.println("received payload:"+objectsDto);
+		System.out.println("[BACKEND LOG] Received payload from Python:"+objectsDto.getName()+"status:"+objectsDto.getStatus()+"trackID:"+objectsDto.getTrack());
 		ObjectsDTO savedDto=objectSer.saveEvent(objectsDto);
 		return new ResponseEntity<>(savedDto,HttpStatus.CREATED);
 		

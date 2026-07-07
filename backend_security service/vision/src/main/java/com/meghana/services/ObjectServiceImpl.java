@@ -32,7 +32,7 @@ public class ObjectServiceImpl implements ObjectService {
 	@Override
 	public ObjectsDTO saveEvent(ObjectsDTO objectsDto) {
 		// 1. Check if this tracked target name already has a history record in our DB
-		Optional<Objects> lastRecordedEvent = repository.findTopByNameOrderByIdDesc(objectsDto.getName());
+		Optional<Objects> lastRecordedEvent = repository.findByTrackAndName(objectsDto.getTrack(),objectsDto.getName());
 		
 		if (lastRecordedEvent.isPresent()) {
 			Objects historicalEvent = lastRecordedEvent.get();
@@ -42,6 +42,12 @@ public class ObjectServiceImpl implements ObjectService {
 				System.out.println("[TELEMETRY SERVICE] Dropped duplicate tracking frame for: " 
 						+ objectsDto.getName() + " [" + objectsDto.getStatus() + "]");
 				return null; // Return null so the controller layer knows it was a duplicate frame
+			}
+			else {
+				historicalEvent.setStatus(objectsDto.getStatus());
+				Objects changedEntity=this.repository.save(historicalEvent);
+				objectsDto.setId(changedEntity.getId());
+				return emit(objectsDto);
 			}
 		}
 
@@ -53,16 +59,16 @@ public class ObjectServiceImpl implements ObjectService {
 		objectsDto.setId(savedEntity.getId());
 		
 		// 4. Broadcast the clean state transition alert live to all open Angular client dashboard screens
-		for (SseEmitter emitter : emitters) {
-			try {
-				emitter.send(objectsDto, MediaType.APPLICATION_JSON);
-			} catch (IOException e) {
-				this.emitters.remove(emitter);
-			}
-		}
-		
-		System.out.println("[TELEMETRY SERVICE] Successfully persisted and streamed new state event for: " + objectsDto.getName());
-		return objectsDto;
+//		for (SseEmitter emitter : emitters) {
+//			try {
+//				emitter.send(objectsDto, MediaType.APPLICATION_JSON);
+//			} catch (IOException e) {
+//				this.emitters.remove(emitter);
+//			}
+//		}
+//		
+//		System.out.println("[TELEMETRY SERVICE] Successfully persisted and streamed new state event for: " + objectsDto.getName());
+		return emit(objectsDto);
 	}
 
 	@Override
@@ -74,5 +80,18 @@ public class ObjectServiceImpl implements ObjectService {
 		emitter.onTimeout(() -> this.emitters.remove(emitter));
 		
 		return emitter;
+	}
+	public ObjectsDTO emit(ObjectsDTO obj) {
+		
+		for (SseEmitter emitter : emitters) {
+			try {
+				emitter.send(obj, MediaType.APPLICATION_JSON);
+			} catch (IOException e) {
+				this.emitters.remove(emitter);
+			}
+		}
+		
+		System.out.println("[TELEMETRY SERVICE] Successfully persisted and streamed new state event for: " + obj.getName());
+		return obj;
 	}
 }
