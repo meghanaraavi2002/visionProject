@@ -19,5 +19,5 @@ bin/
 **/*.pyc
 **/yolov8n.pt
 
-**/known_faces/
+known_faces
 **/myenv
