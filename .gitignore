@@ -18,3 +18,6 @@ bin/
 **/__pycache__/
 **/*.pyc
 **/yolov8n.pt
+
+**/known_faces
+**/myenv
